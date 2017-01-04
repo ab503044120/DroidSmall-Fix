@@ -1,0 +1,7 @@
+com.squareup:javawriter:2.5.1
+com.squareup.okio:okio:1.6.0
+de.devland.esperandro:esperandro:2.2.0
+com.jakewharton:butterknife:7.0.1
+de.devland.esperandro:esperandro-api:2.2.0
+com.squareup.okhttp3:okhttp:3.2.0
+com.google.android:annotations:4.1.1.4
