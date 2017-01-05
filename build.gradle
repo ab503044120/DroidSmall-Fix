@@ -68,8 +68,7 @@ small {
 
     aarVersion = "1.1.0-beta9"
 
-//    strictSplitResources = false
-
+    strictSplitResources = false
 
 
     // The project-wide Android version configurations
@@ -89,6 +88,6 @@ small {
 ext {
     compileSdkVersion = 23
     buildToolsVersion = "23.0.3"
-    minSdkVersion = 14
+    minSdkVersion = 16
     targetSdkVersion = 23
 }

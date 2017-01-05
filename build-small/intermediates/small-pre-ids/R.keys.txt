@@ -1575,6 +1575,7 @@ int style TvTextViewStyle
 int color bg
 int color bg_pressed
 int color black
+int color blue
 int color divider_1
 int color divider_2
 int color font_black_0
@@ -1584,11 +1585,10 @@ int color font_black_3
 int color font_black_4
 int color font_black_5
 int color font_black_6
-int color transparent
-int color white
-int color blue
 int color purple
 int color red
+int color transparent
+int color white
 int id toolbar
 int attr md_background_color
 int attr md_btn_negative_selector
