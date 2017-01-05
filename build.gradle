@@ -68,7 +68,7 @@ small {
 
     aarVersion = "1.1.0-beta9"
 
-    strictSplitResources = false
+//    strictSplitResources = false
 
 
     // The project-wide Android version configurations
