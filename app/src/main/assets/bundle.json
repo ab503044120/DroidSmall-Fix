@@ -6,6 +6,13 @@
       "pkg": "com.sunfusheng.small.lib.style"
     },
     {
+      "uri": "lib.extend",
+      "pkg": "org.huihui.lib.extend"
+    }, {
+      "uri": "lib.bugly",
+      "pkg": "org.huihui.lib.bugly"
+    },
+    {
       "uri": "lib.framework",
       "pkg": "com.sunfusheng.small.lib.framework"
     },

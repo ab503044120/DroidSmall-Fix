@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity {
         initData();
         initView();
         initListener();
+        org.huihui.lib.extend.DialogUtils.showProgre(this);
     }
 
     private void initData() {
@@ -68,6 +69,7 @@ public class MainActivity extends BaseActivity {
         if (getSettingsSharedPreferences().additions_code() <= 0) {
             getSettingsSharedPreferences().additions_code(0);
         }
+
     }
 
     private void initView() {

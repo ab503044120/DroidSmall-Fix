@@ -3,6 +3,7 @@ package com.sunfusheng.small;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import net.wequick.small.Small;
 
@@ -23,8 +24,12 @@ public class LaunchActivity extends AppCompatActivity {
                 Small.setUp(LaunchActivity.this, new Small.OnCompleteListener() {
                     @Override
                     public void onComplete() {
-                        Small.openUri("main", LaunchActivity.this);
-                        finish();
+                        if (Small.openUri("main1", LaunchActivity.this)) {
+                            finish();
+                        }else{
+                            Toast.makeText(getApplicationContext(),"启动失败",Toast.LENGTH_SHORT).show();
+                            throw new IllegalStateException("找不到main1");
+                        }
                     }
                 });
             }
