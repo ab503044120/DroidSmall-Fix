@@ -1,8 +1,0 @@
-com.android.support:appcompat-v7:24.1.0
-com.afollestad.material-dialogs:core:0.8.6.2
-com.android.support:support-vector-drawable:24.1.0
-me.zhanghai.android.materialprogressbar:library:1.1.7
-com.orhanobut:logger:1.4
-com.android.support:recyclerview-v7:24.1.0
-com.android.support:support-v4:24.1.0
-com.android.support:animated-vector-drawable:24.1.0
