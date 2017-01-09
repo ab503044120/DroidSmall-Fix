@@ -9,6 +9,9 @@
       "uri": "lib.extend",
       "pkg": "org.huihui.lib.extend"
     }, {
+      "uri": "lib.realm",
+      "pkg": "org.huihui.lib.realm"
+    }, {
       "uri": "lib.bugly",
       "pkg": "org.huihui.lib.bugly"
     },

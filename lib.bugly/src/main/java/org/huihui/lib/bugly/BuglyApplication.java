@@ -14,6 +14,6 @@ public class BuglyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         CrashReport.initCrashReport(getApplicationContext(), "0fea2661d6", false);
-        Log.e("bugly","我初始化完成了");
+        Log.e("application","我初始化完成了");
     }
 }

@@ -24,4 +24,5 @@ dependencies {
     compile project(':lib.framework')
     compile project(':lib.style')
     compile project(':lib.extend')
+    compile project(':lib.realm')
 }

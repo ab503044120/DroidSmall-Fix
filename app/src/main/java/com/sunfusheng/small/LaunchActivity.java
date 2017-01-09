@@ -24,11 +24,11 @@ public class LaunchActivity extends AppCompatActivity {
                 Small.setUp(LaunchActivity.this, new Small.OnCompleteListener() {
                     @Override
                     public void onComplete() {
-                        if (Small.openUri("main1", LaunchActivity.this)) {
+                        if (Small.openUri("main", LaunchActivity.this)) {
                             finish();
                         }else{
                             Toast.makeText(getApplicationContext(),"启动失败",Toast.LENGTH_SHORT).show();
-                            throw new IllegalStateException("找不到main1");
+                            throw new IllegalStateException("找不到main");
                         }
                     }
                 });

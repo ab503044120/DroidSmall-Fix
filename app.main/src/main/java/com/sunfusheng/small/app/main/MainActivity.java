@@ -18,8 +18,11 @@ import com.sunfusheng.small.lib.framework.util.ToastTip;
 
 import net.wequick.small.Small;
 
+import org.huihui.lib.realm.User;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 
 public class MainActivity extends BaseActivity {
 
@@ -50,7 +53,22 @@ public class MainActivity extends BaseActivity {
         initData();
         initView();
         initListener();
+        Realm defaultInstance = Realm.getDefaultInstance();
+        User first = defaultInstance.where(User.class).findFirst();
+        if (first != null) {
+            tvStatus.setVisibility(View.VISIBLE);
+            tvStatus.setText(first.getName() + first.getAge());
+        } else {
+            first = new User();
+            first.setUID("1");
+            first.setAge(1);
+            first.setName("张三");
+            defaultInstance.beginTransaction();
+            defaultInstance.copyToRealm(first);
+            defaultInstance.commitTransaction();
+        }
         org.huihui.lib.extend.DialogUtils.showProgre(this);
+
     }
 
     private void initData() {
