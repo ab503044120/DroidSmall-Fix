@@ -18,7 +18,17 @@ import com.sunfusheng.small.lib.framework.util.ToastTip;
 
 import net.wequick.small.Small;
 
+import org.greenrobot.greendao.query.Query;
+import org.huihui.lib.greendao.DaoSession;
+import org.huihui.lib.greendao.GreenDaoApplication;
+import org.huihui.lib.greendao.Note;
+import org.huihui.lib.greendao.NoteDao;
+import org.huihui.lib.greendao.NoteType;
 import org.huihui.lib.realm.User;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -43,6 +53,8 @@ public class MainActivity extends BaseActivity {
 
     private LocalBroadcastManager mLocalBroadcastManager;
     private MyBroadcastReceiver mBroadcastReceiver;
+    private NoteDao noteDao;
+    private Query<Note> notesQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +79,23 @@ public class MainActivity extends BaseActivity {
             defaultInstance.copyToRealm(first);
             defaultInstance.commitTransaction();
         }
+
         org.huihui.lib.extend.DialogUtils.showProgre(this);
+
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        String comment = "Added on " + df.format(new Date());
+        DaoSession daoSession = GreenDaoApplication.getDaoSession();
+        noteDao = daoSession.getNoteDao();
+        notesQuery = noteDao.queryBuilder().orderAsc(NoteDao.Properties.Text).build();
+        List<Note> list = notesQuery.list();
+        if (list.isEmpty()) {
+            Note note = new Note(null, "123", comment, new Date(), NoteType.TEXT);
+            noteDao.insert(note);
+        }else{
+            tvStatus.setVisibility(View.VISIBLE);
+            tvStatus.append(list.get(0).getComment());
+        }
+
 
     }
 

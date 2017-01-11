@@ -25,4 +25,5 @@ dependencies {
     compile project(':lib.style')
     compile project(':lib.extend')
     compile project(':lib.realm')
+    compile project(':lib.greendao')
 }
