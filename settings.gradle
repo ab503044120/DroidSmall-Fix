@@ -1,7 +1,10 @@
-include ':app', ':lib.extend', ':lib.bugly', ':lib.realm', ':lib.greendao',
+include ':app', ':lib.extend', ':lib.bugly', ':lib.realm', ':lib.greendao', ':buildSrc',
         ':lib.style',
         ':lib.framework',
         ':app.main',
         ':app.phone',
         ':app.weather',
         ':app.shanghai.weather'
+
+
+

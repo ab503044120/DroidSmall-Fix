@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
+apply plugin: 'realm-android'
 
 Properties prop = new Properties()
 prop.load(new FileInputStream(file("../signing.properties")))
@@ -50,6 +52,15 @@ android {
                 variant -> generateAppName(variant)
             }
         }
+        splits {
+            // Split apks on build target ABI, view all options for the splits here:
+            // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
+            abi {
+                enable true
+                reset()
+                include 'armeabi-v7a'//, 'arm64-v8a', 'mips', 'x86', 'x86_64'//'armeabi'
+            }
+        }
     }
 }
 
@@ -67,4 +78,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.afollestad.material-dialogs:core:0.8.6.2'
+    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    compile 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
+    compile 'net.zetetic:android-database-sqlcipher:3.5.4'
 }
