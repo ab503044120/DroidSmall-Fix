@@ -3,6 +3,7 @@
 /local.properties
 /.idea
 /build
+*/build
 */smallLibs
 /build-small
 */public.txt
