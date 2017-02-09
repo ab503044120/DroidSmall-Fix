@@ -251,25 +251,18 @@ public class RootExtension extends BaseExtension {
     }
 
     protected boolean isLibProject(Project project) {
-        boolean found = false;
-        if (libProjects != null) {
-            found = libProjects.contains(project);
-        }
-        if (!found && hostStubProjects != null) {
-            found = hostStubProjects.contains(project);
-        }
-        return found;
+        if (libProjects == null || libProjects.isEmpty()) return false
+
+        return libProjects.contains(project)
     }
 
     protected boolean isLibProject(String name) {
-        boolean found = false;
-        if (libProjects != null) {
-            found = libProjects.find{ it.name == name } != null;
+        if (libProjects == null || libProjects.isEmpty()) return false
+
+        for (Project p : libProjects) {
+            if (p.name == name) return true
         }
-        if (!found && hostStubProjects != null) {
-            found = hostStubProjects.find{ it.name == name } != null;
-        }
-        return found;
+        return false
     }
 
     public def android(Closure closure) {

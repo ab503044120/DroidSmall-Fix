@@ -340,7 +340,7 @@ class AppPlugin extends BundlePlugin {
 
         // Add reference libraries
         proguard.doFirst {
-            getLibraryJars().findAll{ it.exists() }.each {
+            getLibraryJars().each {
                 // FIXME: the `libraryJar' method is protected, may be depreciated
                 pt.libraryJar(it)
             }
@@ -388,7 +388,7 @@ class AppPlugin extends BundlePlugin {
     }
 
     /** Collect the vendor aars (has resources) compiling in current bundle */
-    protected void collectVendorAars(Set<ResolvedDependency> outFirstLevelAars,
+    protected void collectVendorAars(Set<Map> outFirstLevelAars,
                                      Set<Map> outTransitiveAars) {
         project.configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.each {
             collectVendorAars(it, outFirstLevelAars, outTransitiveAars)
@@ -396,7 +396,7 @@ class AppPlugin extends BundlePlugin {
     }
 
     protected boolean collectVendorAars(ResolvedDependency node,
-                                        Set<ResolvedDependency> outFirstLevelAars,
+                                        Set<Map> outFirstLevelAars,
                                         Set<Map> outTransitiveAars) {
         def group = node.moduleGroup,
             name = node.moduleName,
@@ -420,8 +420,8 @@ class AppPlugin extends BundlePlugin {
         def resDir = new File(small.aarDir, "$path/res")
         // If the dependency has resources, collect it
         if (resDir.exists() && resDir.list().size() > 0) {
-            if (outFirstLevelAars != null && !outFirstLevelAars.contains(node)) {
-                outFirstLevelAars.add(node)
+            if (outFirstLevelAars != null && !outFirstLevelAars.contains(aar)) {
+                outFirstLevelAars.add(aar)
             }
             if (!outTransitiveAars.contains(aar)) {
                 outTransitiveAars.add(aar)
@@ -439,24 +439,10 @@ class AppPlugin extends BundlePlugin {
         }
         if (!flag) return false
 
-        if (outFirstLevelAars != null && !outFirstLevelAars.contains(node)) {
-            outFirstLevelAars.add(node)
+        if (outFirstLevelAars != null && !outFirstLevelAars.contains(aar)) {
+            outFirstLevelAars.add(aar)
         }
         return true
-    }
-
-    protected void collectTransitiveAars(ResolvedDependency node,
-                                         Set<ResolvedDependency> outAars) {
-        def group = node.moduleGroup,
-            name = node.moduleName
-
-        if (small.splitAars.find { aar -> group == aar.group && name == aar.name } == null) {
-            outAars.add(node)
-        }
-
-        node.children.each {
-            collectTransitiveAars(it, outAars)
-        }
     }
 
     /**
@@ -467,7 +453,7 @@ class AppPlugin extends BundlePlugin {
         if (!idsFile.exists()) return
 
         // Check if has any vendor aars
-        def firstLevelVendorAars = [] as Set<ResolvedDependency>
+        def firstLevelVendorAars = [] as Set<Map>
         def transitiveVendorAars = [] as Set<Map>
         collectVendorAars(firstLevelVendorAars, transitiveVendorAars)
         if (firstLevelVendorAars.size() > 0) {
@@ -483,16 +469,8 @@ class AppPlugin extends BundlePlugin {
                 err.append('    }')
                 throw new UnsupportedOperationException(err.toString())
             } else {
-                Set<ResolvedDependency> reservedAars = new HashSet<>()
-                firstLevelVendorAars.each {
-                    Log.warn("Using vendor aar '$it.name'")
-
-                    // If we don't split the aar then we should reserved all it's transitive aars.
-                    collectTransitiveAars(it, reservedAars)
-                }
-                reservedAars.each {
-                    mUserLibAars.add(group: it.moduleGroup, name: it.moduleName, version: it.moduleVersion)
-                }
+                def aars = firstLevelVendorAars.collect{ it.name }.join('; ')
+                Log.warn("Using vendor aar(s): $aars")
             }
         }
 
@@ -945,7 +923,7 @@ class AppPlugin extends BundlePlugin {
      * TODO: filter the native libraries while exploding aar
      */
     def hookMergeJniLibs(TransformTask t) {
-        stripAarFiles(t, { splitPaths ->
+        stripAarFiles(t, { paths ->
             t.streamInputs.each {
                 def version = it.parentFile
                 def name = version.parentFile
@@ -954,12 +932,9 @@ class AppPlugin extends BundlePlugin {
                 if (root.name != 'exploded-aar') return
 
                 def aar = [group: group.name, name: name.name, version: version.name]
-                if (mUserLibAars.contains(aar)) {
-                    // keep the user libraries
-                    return
-                }
+                if (mUserLibAars.contains(aar)) return
 
-                splitPaths.add(it)
+                paths.add(it)
             }
         })
     }
@@ -1064,29 +1039,19 @@ class AppPlugin extends BundlePlugin {
         // Collect aar(s) in lib.*
         mTransitiveDependentLibProjects.each { lib ->
             // lib.* dependencies
-            collectAarsOfProject(lib, smallLibAars)
+            File file = new File(rootSmall.preLinkAarDir, "$lib.name-D.txt")
+            collectAars(file, lib, smallLibAars)
 
             // lib.* self
             smallLibAars.add(group: lib.group, name: lib.name, version: lib.version)
         }
 
         // Collect aar(s) in host
-        collectAarsOfProject(rootSmall.hostProject, smallLibAars)
+        File hostAarDependencies = new File(rootSmall.preLinkAarDir, "$rootSmall.hostModuleName-D.txt")
+        collectAars(hostAarDependencies, rootSmall.hostProject, smallLibAars)
 
         small.splitAars = smallLibAars
         small.retainedAars = mUserLibAars
-    }
-
-    protected def collectAarsOfProject(Project project, HashSet outAars) {
-        String dependenciesFileName = "$project.name-D.txt"
-
-        // Pure aars
-        File file = new File(rootSmall.preLinkAarDir, dependenciesFileName)
-        collectAars(file, project, outAars)
-
-        // Jar-only aars
-        file = new File(rootSmall.preLinkJarDir, dependenciesFileName)
-        collectAars(file, project, outAars)
     }
 
     private def hookProcessManifest(Task processManifest) {
@@ -1306,7 +1271,7 @@ class AppPlugin extends BundlePlugin {
     private def hookJavac(Task javac, boolean minifyEnabled) {
         javac.doFirst { JavaCompile it ->
             // Dynamically provided jars
-            it.classpath += project.files(getLibraryJars().findAll{ it.exists() })
+            it.classpath += project.files(getLibraryJars())
         }
         javac.doLast { JavaCompile it ->
             if (minifyEnabled) return // process later in proguard task

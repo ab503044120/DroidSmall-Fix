@@ -1,9 +1,7 @@
 package net.wequick.gradle
 
 import net.wequick.gradle.aapt.SymbolParser
-import net.wequick.gradle.tasks.LintTask
 import net.wequick.gradle.util.DependenciesUtils
-import net.wequick.gradle.util.Log
 import org.gradle.api.Project
 import org.gradle.api.tasks.Delete
 
@@ -143,12 +141,12 @@ class RootPlugin extends BasePlugin {
                     }
                     rootExt.appProjects.each {
                         it.afterEvaluate {
-                            it.dependencies.add('compile', stub)
+                            it.dependencies.add('debugCompile', stub)
                         }
                     }
                     rootExt.libProjects.each {
                         it.afterEvaluate {
-                            it.dependencies.add('compile', stub)
+                            it.dependencies.add('debugCompile', stub)
                         }
                     }
                 }
@@ -330,23 +328,6 @@ class RootPlugin extends BasePlugin {
 
             printRows(rows)
             println()
-        }
-
-        project.afterEvaluate {
-            small.hostProject.afterEvaluate {
-                def flavorName = 'Release'
-                com.android.build.gradle.AppExtension android = it.android
-                if (android.productFlavors.size() > 0) {
-                    flavorName = android.productFlavors[0].name.capitalize() + 'Release'
-                }
-
-                def hostDexTaskName = ":app:transformClassesWithDexFor$flavorName"
-                project.task('smallLint',
-                        type: LintTask,
-                        dependsOn: [hostDexTaskName]) {
-                    rootSmall = small
-                }
-            }
         }
     }
 
@@ -540,15 +521,6 @@ class RootPlugin extends BasePlugin {
 
             def aarPw = new PrintWriter(aarLinkFile.newWriter(true))
             def jarPw = new PrintWriter(jarLinkFile.newWriter(true))
-
-            // Cause the later aar(as fresco) may dependent by 'com.android.support:support-compat'
-            // which would duplicate with the builtin 'appcompat' and 'support-v4' library in host.
-            // Hereby we also mark 'support-compat' has compiled in host.
-            // FIXME: any influence of this?
-            if (lib == small.hostProject) {
-                aarPw.println "com.android.support:support-compat:+"
-                aarPw.println "com.android.support:support-core-utils:+"
-            }
 
             allDependencies.each { d ->
                 def isAar = true
